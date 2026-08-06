@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎸 Radar de Eventos Locais</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #fff; padding: 20px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 700px; }
+    header { text-align: center; margin-bottom: 25px; }
+    header h1 { font-size: 1.8rem; color: #e50914; margin-bottom: 8px; }
+    header p { color: #aaa; font-size: 0.95rem; }
+    
+    .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 25px; }
+    input, button { padding: 12px; border-radius: 6px; border: 1px solid #333; background-color: #1e1e1e; color: #fff; font-size: 1rem; }
+    input:focus { outline: none; border-color: #e50914; }
+    button { background-color: #e50914; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
+    button:hover { background-color: #b80710; }
+    
+    .loading { text-align: center; color: #aaa; margin-top: 20px; font-style: italic; }
+    .card { background-color: #1e1e1e; border-left: 4px solid #e50914; padding: 18px; border-radius: 8px; margin-bottom: 15px; }
+    .card h3 { color: #fff; margin-bottom: 8px; }
+    .card p { color: #ccc; font-size: 0.9rem; margin-bottom: 5px; }
+    .card a { color: #e50914; text-decoration: none; font-weight: bold; font-size: 0.85rem; display: inline-block; margin-top: 5px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>🎸 Radar de Eventos Locais</h1>
+      <p>Descubra shows, feiras e eventos pela internet em qualquer cidade</p>
+    </header>
+
+    <div class="form-group">
+      <input type="text" id="termo" placeholder="Estilo / Termo (ex: Rock)" value="Rock">
+      <input type="text" id="local" placeholder="Cidade ou CEP" value="Piracicaba">
+      <button onclick="buscarEventos()">Buscar Eventos</button>
+    </div>
+
+    <div id="resultados">
+      <!-- Os resultados da busca aparecerão aqui -->
+    </div>
+  </div>
+
+  <script>
+    // Substitua pela URL do Render na PARTE 4
+    const URL_DO_SERVIDOR = "https://radar-eventos-api.onrender.com"; 
+
+    async function buscarEventos() {
+      const termo = document.getElementById('termo').value;
+      const local = document.getElementById('local').value;
+      const painel = document.getElementById('resultados');
+
+      painel.innerHTML = `<p class="loading">🔍 Varrendo páginas públicas e redes sociais em ${local}...</p>`;
+
+      try {
+        const resposta = await fetch(`${URL_DO_SERVIDOR}/api/eventos?termo=${encodeURIComponent(termo)}&local=${encodeURIComponent(local)}`);
+        const dados = await resposta.json();
+
+        if (!dados.resultados || dados.resultados.length === 0) {
+          painel.innerHTML = "<p class='loading'>Nenhum evento encontrado no momento.</p>";
+          return;
+        }
+
+        painel.innerHTML = "";
+        dados.resultados.forEach(evento => {
+          painel.innerHTML += `
+            <div class="card">
+              <h3>${evento.titulo}</h3>
+              <p>📍 <strong>Local:</strong> ${evento.local}</p>
+              <p>📅 <strong>Data:</strong> ${evento.data}</p>
+              <p>ℹ️ <strong>Fonte:</strong> ${evento.fonte}</p>
+              <a href="${evento.link}" target="_blank">Ver detalhes originais ➔</a>
+            </div>
+          `;
+        });
+
+      } catch (erro) {
+        painel.innerHTML = "<p class='loading' style='color:#ff5555'>Servidor inicializando ou fora do ar. Aguarde 30 segundos e tente novamente.</p>";
+      }
+    }
+  </script>
+</body>
+</html>

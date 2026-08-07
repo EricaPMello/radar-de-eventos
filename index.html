@@ -234,6 +234,11 @@
         painel.innerHTML = `<div class="status-msg" style="color: #ff5555;">Servidor inicializando. Aguarde cerca de 30 segundos e tente novamente.</div>`;
       }
     }
+
+    // Registro do Service Worker para suporte a PWA/App Instalável
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
   </script>
 </body>
 </html>

@@ -1,24 +1,24 @@
 {
-  "id": "/radar-de-eventos/",
+  "id": "https://ericapmello.github.io/radar-de-eventos/",
   "name": "Hey Ho, Let's Go!",
   "short_name": "HeyHoLetsGo",
   "description": "Encontre shows, bares e rolês na sua região",
-  "start_url": "./index.html",
+  "start_url": "https://ericapmello.github.io/radar-de-eventos/index.html",
+  "scope": "https://ericapmello.github.io/radar-de-eventos/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0d0d10",
   "theme_color": "#e50914",
   "icons": [
     {
-      "src": "./icon.png",
+      "src": "https://ericapmello.github.io/radar-de-eventos/icon.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "./icon.png",
+      "src": "https://ericapmello.github.io/radar-de-eventos/icon.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }

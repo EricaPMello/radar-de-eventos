@@ -1,15 +1,24 @@
 {
+  "id": "/radar-de-eventos/",
   "name": "Hey Ho, Let's Go!",
   "short_name": "HeyHoLetsGo",
+  "description": "Encontre shows, bares e rolês na sua região",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0d0d10",
   "theme_color": "#e50914",
   "icons": [
     {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ramones_logo.svg/192px-Ramones_logo.svg.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ramones_logo.svg/512px-Ramones_logo.svg.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

@@ -3,10 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 from bs4 import BeautifulSoup
 import urllib.parse
+import unicodedata
 
 app = FastAPI(title="Radar de Eventos API")
 
-# Permite que o GitHub Pages acesse a API sem bloqueios de CORS
+# Permite comunicação entre o GitHub Pages e a API sem bloqueios de CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,20 +16,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def remover_acentos(texto: str) -> str:
+    """Remove acentos e caracteres especiais para facilitar a busca"""
+    nfkd = unicodedata.normalize('NFKD', texto)
+    return "".join([c for c in nfkd if not unicodedata.combining(c)])
+
 @app.get("/")
 def home():
     return {"status": "Servidor do Radar de Eventos está online!"}
 
 @app.get("/api/eventos")
-def buscar_eventos(termo: str = "Rock", local: str = "Piracicaba"):
-    termo_limpo = termo.strip() if termo else "Rock"
-    local_limpo = local.strip() if local else "Piracicaba"
+def buscar_eventos(termo: str = "rock", local: str = "piracicaba", periodo: str = "proximos"):
+    # Normalização dos termos (remove acentos, espaços extras e converte para minúsculos)
+    termo_limpo = remover_acentos(termo.strip().lower())
+    local_limpo = remover_acentos(local.strip().lower())
     
+    # Define o sufixo temporal para focar em eventos futuros
+    termo_data = "2026 agenda shows eventos"
+    if periodo == "semana":
+        termo_data = "esta semana 2026 agenda shows"
+    elif periodo == "fim_semana":
+        termo_data = "este fim de semana 2026 agenda"
+    elif periodo == "mes":
+        termo_data = "este mes 2026 agenda shows"
+
     eventos = []
 
-    # Busca em tempo real por divulgações públicas e agendas culturais
     try:
-        query_str = f"shows {termo_limpo} {local_limpo} 2026 instagram facebook sympla"
+        query_str = f"shows {termo_limpo} {local_limpo} {termo_data} instagram facebook sympla"
         url_busca = f"https://html.duckduckgo.com/html/?q={urllib.parse.quote(query_str)}"
         
         headers = {
@@ -41,7 +56,7 @@ def buscar_eventos(termo: str = "Rock", local: str = "Piracicaba"):
             soup = BeautifulSoup(response.text, 'html.parser')
             resultados = soup.select('.result')
 
-            for item in resultados[:5]:
+            for item in resultados[:6]:
                 titulo_elem = item.select_one('.result__title')
                 snippet_elem = item.select_one('.result__snippet')
                 url_elem = item.select_one('.result__url')
@@ -58,7 +73,7 @@ def buscar_eventos(termo: str = "Rock", local: str = "Piracicaba"):
 
                     eventos.append({
                         "titulo": titulo,
-                        "local": f"Região de {local_limpo.capitalize()}",
+                        "local": f"Região de {local_limpo.title()}",
                         "data": snippet[:110] + "...",
                         "fonte": "Redes / Portais Culturais",
                         "link": url_real
@@ -66,32 +81,32 @@ def buscar_eventos(termo: str = "Rock", local: str = "Piracicaba"):
     except Exception as e:
         print(f"Erro no processamento da busca: {e}")
 
-    # Fallback contextualizado para garantir retorno de links diretos e atualizados
+    # Fallback garantido com links diretos
     if not eventos:
-        link_sympla = f"https://www.sympla.com.br/eventos/{urllib.parse.quote(local_limpo.lower())}?s={urllib.parse.quote(termo_limpo)}"
-        link_instagram = f"https://www.instagram.com/explore/tags/{urllib.parse.quote(termo_limpo.lower() + local_limpo.lower())}/"
-        link_google = f"https://www.google.com/search?q={urllib.parse.quote('shows de ' + termo_limpo + ' em ' + local_limpo + ' 2026')}"
+        link_sympla = f"https://www.sympla.com.br/eventos/{urllib.parse.quote(local_limpo)}?s={urllib.parse.quote(termo_limpo)}"
+        link_instagram = f"https://www.instagram.com/explore/tags/{urllib.parse.quote(termo_limpo + local_limpo)}/"
+        link_google = f"https://www.google.com/search?q={urllib.parse.quote('agenda de shows ' + termo_limpo + ' em ' + local_limpo + ' 2026')}"
 
         eventos = [
             {
-                "titulo": f"Agenda de {termo_limpo.capitalize()} no Sympla ({local_limpo.capitalize()})",
-                "local": f"Bares, Teatros e Casas de Show em {local_limpo.capitalize()}",
-                "data": "Lista completa de apresentações e vendas de ingresso",
+                "titulo": f"Agenda no Sympla: {termo_limpo.title()} em {local_limpo.title()}",
+                "local": f"Bares e Casas de Show em {local_limpo.title()}",
+                "data": "Apresentações com ingressos e eventos abertos",
                 "fonte": "Sympla Brasil",
                 "link": link_sympla
             },
             {
-                "titulo": f"Publicações do Instagram (#{termo_limpo.lower()}{local_limpo.lower()})",
-                "local": f"Divulgações de bandas e bares locais",
+                "titulo": f"Divulgações no Instagram (#{termo_limpo}{local_limpo})",
+                "local": f"Publicações de bandas e bares locais",
                 "data": "Confira os cartazes e flyers mais recentes",
                 "fonte": "Instagram Public",
                 "link": link_instagram
             },
             {
-                "titulo": f"Pesquisa Aberta: Eventos de {termo_limpo.capitalize()} em {local_limpo.capitalize()}",
-                "local": f"Locais diversos na região de {local_limpo.capitalize()}",
-                "data": "Resultados gerais e notícias de shows",
-                "fonte": "Radar Cultural",
+                "titulo": f"Radar Cultural: {termo_limpo.title()} em {local_limpo.title()}",
+                "local": f"Locais diversos na região de {local_limpo.title()}",
+                "data": "Resultados de programação na web",
+                "fonte": "Busca Cultural Direta",
                 "link": link_google
             }
         ]

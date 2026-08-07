@@ -13,12 +13,23 @@
     {
       "src": "https://ericapmello.github.io/radar-de-eventos/icon.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "https://ericapmello.github.io/radar-de-eventos/icon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://ericapmello.github.io/radar-de-eventos/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Hey Ho, Let's Go!"
     }
   ]
 }

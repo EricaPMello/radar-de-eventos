@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>🎸 Radar de Eventos Locais</title>
+  <title>🤘 Hey Ho, Let's Go!</title>
   
   <!-- Suporte para instalação como Aplicativo (PWA) -->
   <link rel="manifest" href="manifest.json">
@@ -132,21 +132,19 @@
 
   <div class="app-container">
     <header>
-      <h1>🎸 Radar de Eventos</h1>
-      <p>Banda, bar, cantor ou estilo na sua cidade</p>
+      <h1>🤘 Hey Ho, Let's Go!</h1>
+      <p>Encontre shows, bares e rolês na sua região</p>
     </header>
 
     <section class="search-card">
       <div class="form-grid">
         <div class="input-group">
           <label for="termo">Pesquisa Livre (Banda, Bar, Estilo)</label>
-          <!-- Atributo value removido para iniciar totalmente em branco -->
           <input type="text" id="termo" placeholder="Ex: rock, ira, bares, tributo">
         </div>
 
         <div class="input-group">
           <label for="local">Cidade ou CEP</label>
-          <!-- Atributo value removido para iniciar totalmente em branco -->
           <input type="text" id="local" placeholder="Ex: piracicaba, osasco, sao paulo">
         </div>
 
@@ -189,11 +187,10 @@
       const local = localInput.value.trim();
       const periodo = document.getElementById('periodo').value;
 
-      // Validação para garantir que o usuário preencheu ambos os campos
       if (!termo || !local) {
         painel.innerHTML = `
           <div class="status-msg" style="color: #ffaa00;">
-            Por favor, preencha o campo de busca (ex: rock, banda) e a cidade desejada.
+            Por favor, preencha o campo de busca e a cidade desejada.
           </div>
         `;
         return;

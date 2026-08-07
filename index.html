@@ -140,12 +140,14 @@
       <div class="form-grid">
         <div class="input-group">
           <label for="termo">Pesquisa Livre (Banda, Bar, Estilo)</label>
-          <input type="text" id="termo" placeholder="Ex: rock, ira, bares, tributo" value="rock">
+          <!-- Atributo value removido para iniciar totalmente em branco -->
+          <input type="text" id="termo" placeholder="Ex: rock, ira, bares, tributo">
         </div>
 
         <div class="input-group">
           <label for="local">Cidade ou CEP</label>
-          <input type="text" id="local" placeholder="Ex: piracicaba, osasco, sao paulo" value="piracicaba">
+          <!-- Atributo value removido para iniciar totalmente em branco -->
+          <input type="text" id="local" placeholder="Ex: piracicaba, osasco, sao paulo">
         </div>
 
         <div class="input-group">
@@ -168,7 +170,7 @@
       <div class="results-header">📍 Próximos Eventos Encontrados</div>
       <div id="resultados" class="results-list">
         <div class="status-msg">
-          Digite qualquer termo e cidade e clique em <strong>Buscar</strong>.
+          Digite a pesquisa desejada, informe a cidade e clique em <strong>Buscar</strong>.
         </div>
       </div>
     </main>
@@ -179,10 +181,23 @@
     const URL_DO_SERVIDOR = "https://radar-de-eventos.onrender.com"; 
 
     async function buscarEventos() {
-      const termo = document.getElementById('termo').value.trim() || 'rock';
-      const local = document.getElementById('local').value.trim() || 'piracicaba';
-      const periodo = document.getElementById('periodo').value;
+      const termoInput = document.getElementById('termo');
+      const localInput = document.getElementById('local');
       const painel = document.getElementById('resultados');
+
+      const termo = termoInput.value.trim();
+      const local = localInput.value.trim();
+      const periodo = document.getElementById('periodo').value;
+
+      // Validação para garantir que o usuário preencheu ambos os campos
+      if (!termo || !local) {
+        painel.innerHTML = `
+          <div class="status-msg" style="color: #ffaa00;">
+            Por favor, preencha o campo de busca (ex: rock, banda) e a cidade desejada.
+          </div>
+        `;
+        return;
+      }
 
       painel.innerHTML = `
         <div class="status-msg">

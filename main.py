@@ -4,8 +4,9 @@ import requests
 from bs4 import BeautifulSoup
 import urllib.parse
 
-app = FastAPI()
+app = FastAPI(title="Radar de Eventos API")
 
+# Permite que o GitHub Pages acesse a API sem bloqueios de CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,18 +21,22 @@ def home():
 
 @app.get("/api/eventos")
 def buscar_eventos(termo: str = "Rock", local: str = "Piracicaba"):
+    termo_limpo = termo.strip() if termo else "Rock"
+    local_limpo = local.strip() if local else "Piracicaba"
+    
     eventos = []
-    
-    # 1. Busca em agregadores de eventos e divulgações públicas via DuckDuckGo
-    termo_limpo = urllib.parse.quote(f"shows {termo} {local} 2026 instagram facebook sympla")
-    url_ddg = f"https://html.duckduckgo.com/html/?q={termo_limpo}"
-    
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
 
+    # Busca em tempo real por divulgações públicas e agendas culturais
     try:
-        response = requests.get(url_ddg, headers=headers, timeout=8)
+        query_str = f"shows {termo_limpo} {local_limpo} 2026 instagram facebook sympla"
+        url_busca = f"https://html.duckduckgo.com/html/?q={urllib.parse.quote(query_str)}"
+        
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+
+        response = requests.get(url_busca, headers=headers, timeout=8)
+        
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
             resultados = soup.select('.result')
@@ -46,7 +51,6 @@ def buscar_eventos(termo: str = "Rock", local: str = "Piracicaba"):
                     snippet = snippet_elem.get_text(strip=True) if snippet_elem else "Divulgação pública de evento."
                     url_raw = url_elem['href'] if url_elem and 'href' in url_elem.attrs else "#"
                     
-                    # Decodifica links de redirecionamento
                     if 'uddg=' in url_raw:
                         url_real = urllib.parse.unquote(url_raw.split('uddg=')[1].split('&')[0])
                     else:
@@ -54,35 +58,42 @@ def buscar_eventos(termo: str = "Rock", local: str = "Piracicaba"):
 
                     eventos.append({
                         "titulo": titulo,
-                        "local": f"Região de {local.capitalize()}",
-                        "data": snippet[:90] + "...",
-                        "fonte": "Redes / Portais de Eventos",
+                        "local": f"Região de {local_limpo.capitalize()}",
+                        "data": snippet[:110] + "...",
+                        "fonte": "Redes / Portais Culturais",
                         "link": url_real
                     })
-
     except Exception as e:
-        print(f"Erro na raspagem: {e}")
+        print(f"Erro no processamento da busca: {e}")
 
-    # 2. Garante retorno de resultados com busca contextualizada em portais e redes
+    # Fallback contextualizado para garantir retorno de links diretos e atualizados
     if not eventos:
-        link_instagram = f"https://www.instagram.com/explore/tags/{urllib.parse.quote(termo.lower() + local.lower())}/"
-        link_sympla = f"https://www.sympla.com.br/eventos/{urllib.parse.quote(local.lower())}?s={urllib.parse.quote(termo)}"
-        
+        link_sympla = f"https://www.sympla.com.br/eventos/{urllib.parse.quote(local_limpo.lower())}?s={urllib.parse.quote(termo_limpo)}"
+        link_instagram = f"https://www.instagram.com/explore/tags/{urllib.parse.quote(termo_limpo.lower() + local_limpo.lower())}/"
+        link_google = f"https://www.google.com/search?q={urllib.parse.quote('shows de ' + termo_limpo + ' em ' + local_limpo + ' 2026')}"
+
         eventos = [
             {
-                "titulo": f"Divulgações de {termo.capitalize()} no Sympla - {local.capitalize()}",
-                "local": f"Casas de Show em {local.capitalize()}",
-                "data": "Confira a agenda de ingressos e apresentações abertas",
-                "fonte": "Sympla Eventos",
+                "titulo": f"Agenda de {termo_limpo.capitalize()} no Sympla ({local_limpo.capitalize()})",
+                "local": f"Bares, Teatros e Casas de Show em {local_limpo.capitalize()}",
+                "data": "Lista completa de apresentações e vendas de ingresso",
+                "fonte": "Sympla Brasil",
                 "link": link_sympla
             },
             {
-                "titulo": f"Publicações no Instagram (#{termo.lower()}{local.lower()})",
-                "local": f"Postagens públicas na região de {local.capitalize()}",
-                "data": "Últimas publicações de bandas e bares",
+                "titulo": f"Publicações do Instagram (#{termo_limpo.lower()}{local_limpo.lower()})",
+                "local": f"Divulgações de bandas e bares locais",
+                "data": "Confira os cartazes e flyers mais recentes",
                 "fonte": "Instagram Public",
                 "link": link_instagram
+            },
+            {
+                "titulo": f"Pesquisa Aberta: Eventos de {termo_limpo.capitalize()} em {local_limpo.capitalize()}",
+                "local": f"Locais diversos na região de {local_limpo.capitalize()}",
+                "data": "Resultados gerais e notícias de shows",
+                "fonte": "Radar Cultural",
+                "link": link_google
             }
         ]
 
-    return {"termo": termo, "local": local, "resultados": eventos}
+    return {"termo": termo_limpo, "local": local_limpo, "resultados": eventos}

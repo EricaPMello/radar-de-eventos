@@ -2,83 +2,317 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>🎸 Radar de Eventos Locais</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #fff; padding: 20px; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 700px; }
-    header { text-align: center; margin-bottom: 25px; }
-    header h1 { font-size: 1.8rem; color: #e50914; margin-bottom: 8px; }
-    header p { color: #aaa; font-size: 0.95rem; }
-    
-    .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 25px; }
-    input, button { padding: 12px; border-radius: 6px; border: 1px solid #333; background-color: #1e1e1e; color: #fff; font-size: 1rem; }
-    input:focus { outline: none; border-color: #e50914; }
-    button { background-color: #e50914; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
-    button:hover { background-color: #b80710; }
-    
-    .loading { text-align: center; color: #aaa; margin-top: 20px; font-style: italic; }
-    .card { background-color: #1e1e1e; border-left: 4px solid #e50914; padding: 18px; border-radius: 8px; margin-bottom: 15px; }
-    .card h3 { color: #fff; margin-bottom: 8px; }
-    .card p { color: #ccc; font-size: 0.9rem; margin-bottom: 5px; }
-    .card a { color: #e50914; text-decoration: none; font-weight: bold; font-size: 0.85rem; display: inline-block; margin-top: 5px; }
+    :root {
+      --bg-color: #0d0d10;
+      --card-bg: #16161a;
+      --accent-color: #e50914;
+      --accent-hover: #b80710;
+      --text-main: #f5f5f7;
+      --text-muted: #a1a1a6;
+      --border-color: #26262b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    header {
+      text-align: center;
+      margin: 16px 0 24px;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 6px;
+    }
+
+    .search-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background-color: #0a0a0c;
+      color: var(--text-main);
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.25);
+    }
+
+    .btn-search {
+      width: 100%;
+      padding: 16px;
+      border-radius: 10px;
+      border: none;
+      background-color: var(--accent-color);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-search:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-search:active {
+      transform: scale(0.98);
+    }
+
+    .results-header {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .results-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .event-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px;
+      transition: transform 0.2s, border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .event-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: var(--accent-color);
+    }
+
+    .event-card:hover {
+      border-color: #38383e;
+      transform: translateY(-2px);
+    }
+
+    .event-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+      line-height: 1.35;
+    }
+
+    .event-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .event-info span {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      line-height: 1.3;
+    }
+
+    .event-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent-color);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: opacity 0.2s;
+    }
+
+    .event-link:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+
+    .status-msg {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <div class="app-container">
     <header>
-      <h1>🎸 Radar de Eventos Locais</h1>
-      <p>Descubra shows, feiras e eventos pela internet em qualquer cidade</p>
+      <h1>🎸 Radar de Eventos</h1>
+      <p>Encontre shows e eventos na sua região em tempo real</p>
     </header>
 
-    <div class="form-group">
-      <input type="text" id="termo" placeholder="Estilo / Termo (ex: Rock)" value="Rock">
-      <input type="text" id="local" placeholder="Cidade ou CEP" value="Piracicaba">
-      <button onclick="buscarEventos()">Buscar Eventos</button>
-    </div>
+    <section class="search-card">
+      <div class="form-grid">
+        <div class="input-group">
+          <label for="termo">Gênero / Estilo</label>
+          <input type="text" id="termo" placeholder="Ex: Rock, Metal, Jazz" value="Rock">
+        </div>
 
-    <div id="resultados">
-      <!-- Os resultados da busca aparecerão aqui -->
-    </div>
+        <div class="input-group">
+          <label for="local">Cidade ou CEP</label>
+          <input type="text" id="local" placeholder="Ex: Piracicaba, Osasco, São Paulo" value="Piracicaba">
+        </div>
+
+        <button class="btn-search" onclick="buscarEventos()">
+          🔍 Buscar Eventos
+        </button>
+      </div>
+    </section>
+
+    <main>
+      <div class="results-header">
+        <span>📍 Eventos Encontrados</span>
+      </div>
+
+      <div id="resultados" class="results-list">
+        <div class="status-msg">
+          Digite o gênero e a cidade desejada e clique em <strong>Buscar Eventos</strong>.
+        </div>
+      </div>
+    </main>
   </div>
 
   <script>
-    // Substitua pela URL do Render na PARTE 4
-    const URL_DO_SERVIDOR = "https://radar-de-eventos.onrender.com/"; 
+    // Altere para a URL exata do seu serviço no Render
+    const URL_DO_SERVIDOR = "https://radar-de-eventos.onrender.com"; 
 
     async function buscarEventos() {
-      const termo = document.getElementById('termo').value;
-      const local = document.getElementById('local').value;
+      const termoInput = document.getElementById('termo');
+      const localInput = document.getElementById('local');
       const painel = document.getElementById('resultados');
 
-      painel.innerHTML = `<p class="loading">🔍 Varrendo páginas públicas e redes sociais em ${local}...</p>`;
+      const termo = termoInput.value.trim() || 'Rock';
+      const local = localInput.value.trim() || 'Piracicaba';
+
+      painel.innerHTML = `
+        <div class="status-msg">
+          ⚡ Varrendo divulgações públicas e redes em <strong>${local}</strong>...<br>
+          <small style="margin-top:8px; display:block; color:#666;">(Aguarde alguns segundos se o servidor estiver despertando)</small>
+        </div>
+      `;
 
       try {
         const resposta = await fetch(`${URL_DO_SERVIDOR}/api/eventos?termo=${encodeURIComponent(termo)}&local=${encodeURIComponent(local)}`);
         const dados = await resposta.json();
 
-        if (!dados.resultados || dados.resultados.length === 0) {
-          painel.innerHTML = "<p class='loading'>Nenhum evento encontrado no momento.</p>";
+        const listaEventos = dados.resultados || dados.eventos || dados;
+
+        if (!Array.isArray(listaEventos) || listaEventos.length === 0) {
+          painel.innerHTML = `<div class="status-msg">Nenhum evento encontrado no momento em ${local}.</div>`;
           return;
         }
 
         painel.innerHTML = "";
-        dados.resultados.forEach(evento => {
+        listaEventos.forEach(evento => {
           painel.innerHTML += `
-            <div class="card">
-              <h3>${evento.titulo}</h3>
-              <p>📍 <strong>Local:</strong> ${evento.local}</p>
-              <p>📅 <strong>Data:</strong> ${evento.data}</p>
-              <p>ℹ️ <strong>Fonte:</strong> ${evento.fonte}</p>
-              <a href="${evento.link}" target="_blank">Ver detalhes originais ➔</a>
-            </div>
+            <article class="event-card">
+              <h2 class="event-title">${evento.titulo}</h2>
+              <div class="event-info">
+                <span>📍 <strong>Local:</strong> ${evento.local}</span>
+                <span>📅 <strong>Data/Info:</strong> ${evento.data}</span>
+                <span>ℹ️ <strong>Fonte:</strong> ${evento.fonte}</span>
+              </div>
+              <a href="${evento.link}" target="_blank" rel="noopener noreferrer" class="event-link">
+                Ver detalhes e divulgações originais ➔
+              </a>
+            </article>
           `;
         });
 
       } catch (erro) {
-        painel.innerHTML = "<p class='loading' style='color:#ff5555'>Servidor inicializando ou fora do ar. Aguarde 30 segundos e tente novamente.</p>";
+        painel.innerHTML = `
+          <div class="status-msg" style="color: #ff5555;">
+            Servidor em inicialização. Aguarde cerca de 30 segundos e clique em Buscar novamente.
+          </div>
+        `;
       }
     }
   </script>

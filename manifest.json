@@ -9,14 +9,8 @@
   "theme_color": "#e50914",
   "icons": [
     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ramones_logo.svg/192px-Ramones_logo.svg.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ramones_logo.svg/512px-Ramones_logo.svg.png",
-      "sizes": "512x512",
+      "src": "./icon.png",
+      "sizes": "192x192 512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }

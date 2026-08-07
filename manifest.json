@@ -1,13 +1,13 @@
 {
-  "name": "Radar de Eventos",
-  "short_name": "RadarEventos",
+  "name": "Hey Ho, Let's Go!",
+  "short_name": "HeyHoLetsGo",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0d0d10",
   "theme_color": "#e50914",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3074/3074394.png",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ramones_logo.svg/512px-Ramones_logo.svg.png",
       "sizes": "512x512",
       "type": "image/png"
     }
